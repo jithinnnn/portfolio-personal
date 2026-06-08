@@ -56,17 +56,29 @@ const jobs = [
   },
 ];
 
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function Experience() {
   const { ref, visible } = useInView();
+  const isMobile = useMobile();
 
   return (
-    <section id="experience" ref={ref} style={{ position: "relative", zIndex: 1, padding: "120px 32px" }}>
+    <section id="experience" ref={ref} style={{ position: "relative", zIndex: 1, padding: isMobile ? "80px 20px" : "120px 32px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
         {/* header */}
-        <div style={{ marginBottom: 72 }}>
+        <div style={{ marginBottom: 72, textAlign: isMobile ? "center" : "left" }}>
           <div style={{
-            display: "flex", alignItems: "center", gap: 12, marginBottom: 16,
+            display: "flex", alignItems: "center", justifyContent: isMobile ? "center" : "flex-start", gap: 12, marginBottom: 16,
             opacity: visible ? 1 : 0, transition: "opacity 0.6s ease",
           }}>
             <div style={{ width: 24, height: 1, background: "var(--violet-bright)" }} />
@@ -92,73 +104,69 @@ export default function Experience() {
 
         {/* timeline */}
         <div style={{ position: "relative" }}>
-          {/* spine line */}
-          <div className="exp-spine" style={{
-            position: "absolute",
-            left: 220,
-            top: 0, bottom: 0,
-            width: 1,
-            background: "linear-gradient(to bottom, transparent, var(--border2) 6%, var(--border2) 94%, transparent)",
-            opacity: visible ? 1 : 0,
-            transition: "opacity 0.8s ease 0.3s",
-          }} />
+          {/* spine line — hidden on mobile */}
+          {!isMobile && (
+            <div style={{
+              position: "absolute",
+              left: 220,
+              top: 0, bottom: 0,
+              width: 1,
+              background: "linear-gradient(to bottom, transparent, var(--border2) 6%, var(--border2) 94%, transparent)",
+              opacity: visible ? 1 : 0,
+              transition: "opacity 0.8s ease 0.3s",
+            }} />
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
             {jobs.map((job, i) => (
-              <JobRow key={job.company} job={job} index={i} />
+              <JobRow key={job.company} job={job} index={i} isMobile={isMobile} />
             ))}
           </div>
 
-          {/* spine end cap */}
-          <div className="exp-spine-cap" style={{
-            position: "absolute",
-            left: 220,
-            bottom: -16,
-            transform: "translateX(-50%)",
-            width: 8, height: 8, borderRadius: "50%",
-            background: "var(--border2)",
-            opacity: visible ? 1 : 0,
-            transition: "opacity 0.6s ease 0.5s",
-          }} />
+          {/* spine end cap — hidden on mobile */}
+          {!isMobile && (
+            <div style={{
+              position: "absolute",
+              left: 220,
+              bottom: -16,
+              transform: "translateX(-50%)",
+              width: 8, height: 8, borderRadius: "50%",
+              background: "var(--border2)",
+              opacity: visible ? 1 : 0,
+              transition: "opacity 0.6s ease 0.5s",
+            }} />
+          )}
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 700px) {
-          .exp-spine, .exp-spine-cap { display: none !important; }
-          .exp-row { flex-direction: column !important; }
-          .exp-meta { width: auto !important; padding-right: 0 !important; flex-direction: row !important; align-items: center !important; gap: 16px !important; }
-          .exp-node { display: none !important; }
-        }
-      `}</style>
     </section>
   );
 }
 
-function JobRow({ job, index }: { job: typeof jobs[0]; index: number }) {
+function JobRow({ job, index, isMobile }: { job: typeof jobs[0]; index: number; isMobile: boolean }) {
   const { ref, v: cardVisible } = useRowInView();
 
   return (
     <div
       ref={ref}
-      className="exp-row"
       style={{
         display: "flex",
+        flexDirection: isMobile ? "column" : "row",
         alignItems: "flex-start",
-        gap: 0,
+        gap: isMobile ? 12 : 0,
       }}
     >
       {/* LEFT — meta column */}
       <div
-        className="exp-meta"
         style={{
-          width: 220,
+          width: isMobile ? "auto" : 220,
           flexShrink: 0,
-          paddingRight: 36,
-          paddingTop: 26,
+          paddingRight: isMobile ? 0 : 36,
+          paddingTop: isMobile ? 0 : 26,
           display: "flex",
-          flexDirection: "column",
-          gap: 6,
+          flexDirection: isMobile ? "row" : "column",
+          flexWrap: isMobile ? "wrap" : "nowrap",
+          alignItems: isMobile ? "center" : "flex-start",
+          gap: isMobile ? 10 : 6,
           opacity: cardVisible ? 1 : 0,
           transform: cardVisible ? "translateX(0)" : "translateX(-20px)",
           transition: `opacity 0.6s ease ${index * 0.1}s, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${index * 0.1}s`,
@@ -209,9 +217,8 @@ function JobRow({ job, index }: { job: typeof jobs[0]; index: number }) {
         </div>
       </div>
 
-      {/* CENTER — spine node */}
-      <div
-        className="exp-node"
+      {/* CENTER — spine node (hidden on mobile) */}
+      {!isMobile && <div
         style={{
           width: 1,
           flexShrink: 0,
@@ -240,12 +247,12 @@ function JobRow({ job, index }: { job: typeof jobs[0]; index: number }) {
             transition: `opacity 0.4s ease ${index * 0.1 + 0.2}s, transform 0.4s cubic-bezier(0.16,1,0.3,1) ${index * 0.1 + 0.2}s`,
           }} />
         </div>
-      </div>
+      </div>}
 
       {/* RIGHT — job card */}
       <div style={{
         flex: 1,
-        paddingLeft: 36,
+        paddingLeft: isMobile ? 0 : 36,
         opacity: cardVisible ? 1 : 0,
         transform: cardVisible ? "translateX(0)" : "translateX(24px)",
         transition: `opacity 0.7s ease ${index * 0.1 + 0.05}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${index * 0.1 + 0.05}s`,

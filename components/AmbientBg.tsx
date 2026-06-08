@@ -1,28 +1,36 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Slowly morphing radial gradients that shift as the user scrolls
 export default function AmbientBg() {
   const ref1 = useRef<HTMLDivElement>(null);
   const ref2 = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
+      // Don't apply scroll parallax on mobile — it causes misalignment
+      if (window.innerWidth < 768) return;
+
       const y = window.scrollY;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const t = max > 0 ? y / max : 0;
 
       if (ref1.current) {
-        // Moves from top-left to bottom-right
         ref1.current.style.top = `${10 + t * 60}%`;
-        ref1.current.style.left = `${-10 + t * 20}%`;
+        ref1.current.style.left = `${-20 + t * 20}%`;
         ref1.current.style.opacity = String(0.5 + t * 0.3);
       }
       if (ref2.current) {
-        // Moves from bottom-right upward
         ref2.current.style.top = `${70 - t * 50}%`;
-        ref2.current.style.right = `${-5 + t * 15}%`;
+        ref2.current.style.right = `${-15 + t * 15}%`;
       }
     };
 
@@ -37,13 +45,11 @@ export default function AmbientBg() {
         ref={ref1}
         style={{
           position: "absolute",
-          width: 700,
-          height: 700,
-          top: "10%",
-          left: "-10%",
-          background:
-            "radial-gradient(ellipse, rgba(124,58,237,0.09) 0%, transparent 65%)",
-          transition: "top 0.8s ease, left 0.8s ease, opacity 0.8s ease",
+          width: isMobile ? "100vw" : "clamp(400px, 50vw, 700px)",
+          height: isMobile ? "60vh" : "clamp(400px, 50vw, 700px)",
+          top: isMobile ? "-20%" : "10%",
+          left: isMobile ? "-20%" : "-20%",
+          background: "radial-gradient(ellipse at center, rgba(124,58,237,0.07) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -52,13 +58,11 @@ export default function AmbientBg() {
         ref={ref2}
         style={{
           position: "absolute",
-          width: 500,
-          height: 500,
-          top: "70%",
-          right: "-5%",
-          background:
-            "radial-gradient(ellipse, rgba(6,182,212,0.06) 0%, transparent 65%)",
-          transition: "top 0.8s ease, right 0.8s ease",
+          width: isMobile ? "100vw" : "clamp(300px, 40vw, 500px)",
+          height: isMobile ? "60vh" : "clamp(300px, 40vw, 500px)",
+          top: isMobile ? "40%" : "70%",
+          right: isMobile ? "-20%" : "-15%",
+          background: "radial-gradient(ellipse at center, rgba(6,182,212,0.05) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />

@@ -25,6 +25,7 @@
 html {
   scroll-behavior: smooth;
   cursor: none;
+  overflow-x: hidden;
 }
 
 body {
@@ -129,13 +130,58 @@ body::after {
   html, body, a, button, [role="button"] { cursor: auto !important; }
 }
 
-/* Ensure sections don't overflow on small screens */
-@media (max-width: 640px) {
-  section { padding-left: 20px !important; padding-right: 20px !important; }
-}
-
 /* Hero: collapse right decorative column on small screens */
 @media (max-width: 860px) {
   .hero-grid { grid-template-columns: 1fr !important; }
   .hero-right { display: none !important; }
+}
+
+/* ─── MOBILE (≤ 640px) ─────────────────────────────────── */
+@media (max-width: 640px) {
+  section { padding-left: 20px !important; padding-right: 20px !important; }
+  .mobile-container { padding-left: 0 !important; padding-right: 0 !important; }
+
+  /* Hero */
+  .hero-grid { padding: 90px 24px 48px !important; gap: 24px !important; }
+  .hero-left { display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; }
+  .hero-left h1 { text-align: center !important; }
+  .hero-left p { text-align: center !important; }
+  .hero-left .hero-availability { justify-content: center !important; }
+  .hero-cta { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
+  .hero-cta a { width: 100% !important; text-align: center !important; box-sizing: border-box !important; display: block !important; }
+  .hero-stats { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; width: 100% !important; justify-items: center !important; }
+  .hero-stats > div { border-left: none !important; padding-left: 0 !important; padding-right: 0 !important; border-top: 1px solid var(--border) !important; padding-top: 16px !important; text-align: center !important; }
+  .hero-stats > div:nth-child(1), .hero-stats > div:nth-child(2) { border-top: none !important; padding-top: 0 !important; }
+  .hero-accent { margin-left: auto !important; margin-right: auto !important; }
+
+  /* Skills */
+  .skills-grid { grid-template-columns: 1fr 1fr !important; }
+  .skills-detail-inner { flex-direction: column !important; gap: 14px !important; }
+  .skills-detail-tags { max-width: 100% !important; flex-shrink: unset !important; }
+
+  /* Experience */
+  .exp-spine, .exp-spine-cap { display: none !important; }
+  .exp-row { flex-direction: column !important; gap: 12px !important; }
+  .exp-meta { width: auto !important; padding-right: 0 !important; padding-top: 0 !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; gap: 10px !important; }
+  .exp-node { display: none !important; }
+  .exp-body { padding-left: 0 !important; }
+
+  /* Projects */
+  .proj-row1 { grid-template-columns: 1fr !important; }
+  .proj-row2 { grid-template-columns: 1fr !important; }
+
+  /* Contact */
+  .contact-grid { grid-template-columns: 1fr 1fr !important; }
+  .contact-section { padding-bottom: 80px !important; }
+
+  /* Footer */
+  .footer-wrap { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; padding: 24px 20px !important; }
+}
+
+/* ─── TABLET (641px – 1023px) ──────────────────────────── */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .hero-grid { padding: 100px 32px 60px !important; }
+  .proj-row2 { grid-template-columns: 1fr 1fr !important; }
+  .contact-grid { grid-template-columns: 1fr 1fr !important; }
+  .skills-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }

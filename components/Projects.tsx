@@ -77,17 +77,29 @@ const rest = [
   },
 ];
 
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function Projects() {
   const { ref, visible } = useInView();
+  const isMobile = useMobile();
 
   return (
-    <section id="projects" ref={ref} style={{ position: "relative", zIndex: 1, padding: "120px 32px" }}>
+    <section id="projects" ref={ref} style={{ position: "relative", zIndex: 1, padding: isMobile ? "80px 20px" : "120px 32px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
         {/* header */}
-        <div style={{ marginBottom: 56 }}>
+        <div style={{ marginBottom: 56, textAlign: isMobile ? "center" : "left" }}>
           <div style={{
-            display: "flex", alignItems: "center", gap: 12, marginBottom: 16,
+            display: "flex", alignItems: "center", justifyContent: isMobile ? "center" : "flex-start", gap: 12, marginBottom: 16,
             opacity: visible ? 1 : 0, transition: "opacity 0.6s ease",
           }}>
             <div style={{ width: 24, height: 1, background: "var(--cyan)" }} />
@@ -114,10 +126,10 @@ export default function Projects() {
         {/* ── row 1: two equal featured cards ── */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
           gap: 14,
           marginBottom: 14,
-        }} className="proj-row1">
+        }}>
           {featured.map((p, i) => (
             <FeaturedCard key={p.id} project={p} visible={visible} delay={i * 0.1} />
           ))}
@@ -126,10 +138,10 @@ export default function Projects() {
         {/* ── row 2: three equal small cards ── */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr",
           gap: 14,
           marginBottom: 48,
-        }} className="proj-row2">
+        }}>
           {rest.map((p, i) => (
             <SmallCard key={p.id} project={p} visible={visible} delay={0.2 + i * 0.08} />
           ))}
@@ -144,15 +156,6 @@ export default function Projects() {
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 720px) {
-          .proj-row1 { grid-template-columns: 1fr !important; }
-          .proj-row2 { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .proj-row2 { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </section>
   );
 }

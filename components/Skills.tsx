@@ -155,20 +155,32 @@ function SkillLogo({ id, color }: { id: string; color: string }) {
   }
 }
 
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 /* ── main component ─────────────────────────────────────── */
 export default function Skills() {
   const { ref, visible } = useInView();
   const [active, setActive] = useState<string | null>(null);
   const activeSkill = skills.find((s) => s.id === active) ?? null;
+  const isMobile = useMobile();
 
   return (
-    <section id="skills" ref={ref} style={{ position: "relative", zIndex: 1, padding: "120px 32px" }}>
+    <section id="skills" ref={ref} style={{ position: "relative", zIndex: 1, padding: isMobile ? "80px 20px" : "120px 32px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
         {/* ── header ── */}
-        <div style={{ marginBottom: 64 }}>
+        <div style={{ marginBottom: 64, textAlign: isMobile ? "center" : "left" }}>
           <div style={{
-            display: "flex", alignItems: "center", gap: 12, marginBottom: 16,
+            display: "flex", alignItems: "center", justifyContent: isMobile ? "center" : "flex-start", gap: 12, marginBottom: 16,
             opacity: visible ? 1 : 0, transition: "opacity 0.6s ease",
           }}>
             <div style={{ width: 24, height: 1, background: "var(--cyan)" }} />
@@ -194,10 +206,9 @@ export default function Skills() {
 
         {/* ── skill cards grid ── */}
         <div
-          className="skills-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
             gap: 12,
             marginBottom: 48,
           }}
@@ -215,17 +226,13 @@ export default function Skills() {
         </div>
 
         {/* ── expanded detail panel ── */}
-        <DetailPanel skill={activeSkill} visible={visible} />
+        <DetailPanel skill={activeSkill} visible={visible} isMobile={isMobile} />
 
         {/* ── marquee tool strip ── */}
         <MarqueeStrip pills={toolPills} visible={visible} />
 
       </div>
 
-      <style>{`
-        @media (max-width: 900px) { .skills-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-        @media (max-width: 480px) { .skills-grid { grid-template-columns: 1fr 1fr !important; } }
-      `}</style>
     </section>
   );
 }
@@ -353,12 +360,12 @@ function LevelArc({ level, color, lit }: { level: number; color: string; lit: bo
 }
 
 /* ── expanded detail panel ──────────────────────────────── */
-function DetailPanel({ skill, visible }: { skill: typeof skills[0] | null; visible: boolean }) {
+function DetailPanel({ skill, visible, isMobile }: { skill: typeof skills[0] | null; visible: boolean; isMobile: boolean }) {
   const show = skill !== null && visible;
   return (
     <div style={{
       overflow: "hidden",
-      maxHeight: show ? 140 : 0,
+      maxHeight: show ? (isMobile ? 500 : 320) : 0,
       opacity: show ? 1 : 0,
       transition: "max-height 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease",
       marginBottom: show ? 36 : 0,
@@ -370,7 +377,8 @@ function DetailPanel({ skill, visible }: { skill: typeof skills[0] | null; visib
           borderRadius: 14,
           padding: "18px 24px",
           display: "flex",
-          gap: 32,
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 14 : 32,
           alignItems: "flex-start",
         }}>
           {/* left: desc */}
@@ -385,7 +393,7 @@ function DetailPanel({ skill, visible }: { skill: typeof skills[0] | null; visib
             <p style={{ fontSize: 13.5, lineHeight: 1.7, color: "#a0a0c0", margin: 0 }}>{skill.desc}</p>
           </div>
           {/* right: tag chips */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, maxWidth: 260, flexShrink: 0, paddingTop: 4 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, maxWidth: isMobile ? "100%" : 260, flexShrink: 0, paddingTop: 4 }}>
             {skill.tags.map((t) => (
               <span key={t} style={{
                 fontFamily: "var(--font-mono), monospace",

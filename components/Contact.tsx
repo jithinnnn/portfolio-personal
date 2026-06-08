@@ -44,11 +44,23 @@ const links = [
   },
 ];
 
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function Contact() {
   const { ref, visible } = useInView();
+  const isMobile = useMobile();
 
   return (
-    <section id="contact" ref={ref} style={{ position: "relative", zIndex: 1, padding: "120px 32px 160px" }}>
+    <section id="contact" ref={ref} style={{ position: "relative", zIndex: 1, padding: isMobile ? "80px 20px 80px" : "120px 32px 160px" }}>
       {/* Background blob */}
       <div
         style={{
@@ -56,8 +68,8 @@ export default function Contact() {
           bottom: 0,
           left: "50%",
           transform: "translateX(-50%)",
-          width: 800,
-          height: 400,
+          width: isMobile ? "100vw" : 800,
+          height: isMobile ? 300 : 400,
           background: "radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
@@ -179,10 +191,9 @@ export default function Contact() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
             gap: 14,
           }}
-          className="contact-grid"
         >
           {links.map((item, i) => (
             <ContactCard
@@ -195,14 +206,6 @@ export default function Contact() {
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .contact-grid { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .contact-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </section>
   );
 }
